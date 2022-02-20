@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+<VirtualHost *:80>
+    ServerName {{ server_name }}
+    DocumentRoot /usr/share/garradin/www
+
+    <Directory /usr/share/garradin/www>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>

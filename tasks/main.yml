@@ -1,0 +1,56 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - apache2
+      - php
+      - php-sqlite3
+      - php-intl
+      - php-cli
+      - php-imagick
+    state: present
+
+- name: Enable Apache
+  ansible.builtin.systemd:
+    name: apache2
+    enabled: yes
+
+- name: Enable PHP modules
+  ansible.builtin.command: phpenmod sqlite3 imagick intl
+
+- name: Download Garradin
+  ansible.builtin.get_url:
+    url: "{{ garradin_package_url }}"
+    dest: "/tmp"
+  register: garradin_download_result
+
+- name: Install Garradin
+  ansible.builtin.apt:
+    deb: "{{ garradin_download_result.dest }}"
+
+- name: Template vHost config
+  ansible.builtin.template:
+    src: templates/garradin.conf.j2
+    dest: /etc/apache2/sites-available/garradin.conf
+  notify: Reload Apache
+
+- name: Enable vHost
+  ansible.builtin.command: a2ensite garradin
+
+- name: Append additional config to `config.local.php`
+  ansible.builtin.blockinfile:
+    path: /usr/share/garradin/config.local.php
+    block: "{{ additional_config }}"
+  when: additional_config is defined
+
+- name: Change displayed icon
+  ansible.builtin.copy:
+    src: "{{ icon }}"
+    dest: "/usr/share/garradin/www/admin/static/icon{{ icon | splitext | last }}"
+  when: icon is defined
+
+- name: Change page favicon
+  ansible.builtin.copy:
+    src: "{{ favicon }}"
+    dest: "/usr/share/garradin/www/admin/static/favicon{{ icon | splitext | last }}"
+  when: favicon is defined

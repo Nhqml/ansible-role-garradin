@@ -1,0 +1,17 @@
+galaxy_info:
+  role_name: garradin
+  author: "Kenji 'Nhqml' Gaillac"
+  description: Install Garradin
+
+  license: GPL-3.0-or-later
+
+  min_ansible_version: 2.12.2
+
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+
+  xy_tags: []
+
+dependencies: []
